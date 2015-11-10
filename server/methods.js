@@ -1,4 +1,4 @@
-const CREATE_CARD_PATH = 'http://bus.stage.exentriq.com/api/cards/createCard';
+const CREATE_CARD_PATH = 'http://boards.stage.exentriq.com/api/cards/createCard';
 
 Meteor.methods({
   createCard: function (title, description) {
