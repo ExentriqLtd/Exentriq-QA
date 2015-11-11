@@ -5,4 +5,5 @@ var Api = new Restivus({
 });
 
 Api.addCollection(Posts);
+Api.addCollection(Comments);
 
