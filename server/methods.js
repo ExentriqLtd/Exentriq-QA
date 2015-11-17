@@ -1,23 +1,25 @@
-const CREATE_CARD_PATH = 'http://bus.stage.exentriq.com/api/cards/createCard';
+// const CREATE_CARD_PATH = 'http://bus.stage.exentriq.com/api/cards/createCard';
+const CREATE_CARD_PATH = 'http://localhost:3000/api/cards/createCard';
+const AVATAR_PATH = 'http://talk.stage.exentriq.com/avatar';
+const INTEGRATION_BUS_PATH = "http://bus.stage.exentriq.com:1880";
+
+const TYPE_POST = 1;
+const TYPE_COMMENT = 2;
 
 Meteor.methods({
-  createCard: function (title, description) {
-    // Make sure the user is logged in before inserting a task
-    if (! Meteor.userId()) {
-      throw new Meteor.Error("not-authorized");
-    }
-
-    check(title, String);
-    check(description, String);
+  createCard: function (post) {
+    check(post.title, String);
+    check(post.body, String);
+    check(post.userId, String);
 
     try {
       var result = HTTP.call('POST',
         CREATE_CARD_PATH,
         { 
           "data":{
-            title: title,
-            description: description,
-            username: Meteor.user().username
+            title: post.title,
+            description: post.description,
+            username: Meteor.users.findOne(post.userId).username
           }
         }
       );
@@ -26,6 +28,52 @@ Meteor.methods({
     }catch(e){
       // Got a network error, time-out or HTTP error in the 400 or 500 range.
       console.log("error", e)
+      return false;
+    }
+  },
+
+  sendNotification: function(doc, type){
+    check(doc.title, String);
+    check(doc._id, String);
+    check(doc.userId, String);
+
+    var from = Meteor.users.findOne(doc.userId).username
+    var to  = '';
+    var action = '';
+    if(type === TYPE_POST)
+      action = 'Created a new post';
+    if(type === TYPE_COMMENT)
+      action = 'Commented on a post';
+    var subject = from + ' ' + action + ' '+ doc.title;
+    var link = '/posts/' + doc._id;
+
+    try {
+      var result = HTTP.call("POST",
+        INTEGRATION_BUS_PATH, {
+          data: {
+            event: "Notification",
+            id: "",
+            entities:[
+              {
+                name:"Notification",
+                value: {
+                  from: from,
+                  to: to,
+                  subject: subject,
+                  message: '',
+                  picture: AVATAR_PATH + from + '.jpg',
+                  link: link
+                }
+              }
+            ]
+          }
+        });
+
+      return true;
+    }catch(e){
+      // Got a network error, time-out or HTTP error in the 400 or 500 range.
+      console.error("error", e);
+      console.log("error", "cannot save notification to integration bus");
       return false;
     }
   }
