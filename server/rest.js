@@ -58,4 +58,5 @@ Api.addRoute('posts/:id', {authRequired: false}, {
   }
 });
 
+// Comments collection routes
 Api.addCollection(Comments);
