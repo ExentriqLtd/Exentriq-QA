@@ -1,5 +1,5 @@
 // const CREATE_CARD_PATH = 'http://bus.stage.exentriq.com/api/cards/createCard';
-const CREATE_CARD_PATH = 'http://localhost:3000/api/cards/createCard';
+const CREATE_CARD_PATH = 'http://localhost:3000/api/cards/createCardFromQA';
 const AVATAR_PATH = 'http://talk.stage.exentriq.com/avatar';
 const INTEGRATION_BUS_PATH = "http://bus.stage.exentriq.com:1880";
 
@@ -12,14 +12,18 @@ Meteor.methods({
     check(post.body, String);
     check(post.userId, String);
 
+    const user = Users.findOne(post.userId);
+    const spaceId = (user.profile.spaceId) ? user.profile.spaceId : '';
+    
     try {
       var result = HTTP.call('POST',
         CREATE_CARD_PATH,
         { 
           "data":{
             title: post.title,
-            description: post.description,
-            username: Meteor.users.findOne(post.userId).username
+            description: post.body,
+            spaceId: spaceId,
+            members: []
           }
         }
       );
