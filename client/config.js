@@ -33,3 +33,7 @@ AccountsTemplates.addFields([
     displayName: "Space ID",
   }
 ])
+
+Template.registerHelper('isStandalone', function(){
+  return window.self === window.top;
+});

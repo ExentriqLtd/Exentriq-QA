@@ -1,0 +1,9 @@
+<template name="custom_notifications_menu">
+	{{#if isStandalone}}
+    {{#if isLoggedIn}}
+      <div class="notifications-menu-wrapper {{moduleClass}}">
+        {{> menuComponent menuName="notifications" menuLabel=menuLabel menuItems=menuItems menuType=menuType expandLevel=0}}
+      </div>
+    {{/if}}
+   {{/if}}
+</template>
