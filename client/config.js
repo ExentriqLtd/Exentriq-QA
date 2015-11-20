@@ -27,15 +27,3 @@ AccountsTemplates.addFields([
 Template.registerHelper('isStandalone', function(){
   return window.self === window.top;
 });
-
-FlowRouter.route('/dologin', {
-  action: function(params, queryParams) {
-    const username = queryParams.username;
-    Meteor.loginWithPassword(username, '', function(error){
-      if(!error)
-        FlowRouter.redirect('');
-      else
-        console.log('Sorry but you cannot do this.')
-    })
-  }
-});

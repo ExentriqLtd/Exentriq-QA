@@ -87,26 +87,20 @@ Meteor.methods({
     return userId;
   },
 
-  loginPlatformUser: function(username, password) {
-    var future;
-    console.log('[methods] loginPlatformUser -> '.green, 'username:', username);
-    future = new Future();
-    HTTP.call('POST', 'http://exentriq.com/JSON-RPC', {
+  findUserByName: function(username){
+    return Meteor.users.findOne({username: username}, { fields: {_id: 1}});
+  },
+
+  verifyToken: function(token) {
+    var result = HTTP.call('POST', 'http://stage.exentriq.com/JSON-RPC', {
       data: {
         id: '',
-        method: 'auth.login',
-        params: [username, password]
-      }
-    }, function(error, result) {
-      console.log('Returned');
-      console.log(result);
-      if (JSON.parse(result.content).result) {
-        return future["return"](result);
-      } else {
-        return future["return"](null);
+        method: 'auth.loginBySessionToken',
+        params: [token]
       }
     });
-    return future.wait();
+
+    return result;
   }
 
 });
