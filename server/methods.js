@@ -18,7 +18,7 @@ Meteor.methods({
     try {
       var result = HTTP.call('POST',
         CREATE_CARD_PATH,
-        { 
+        {
           "data":{
             title: post.title,
             description: post.body,
@@ -80,5 +80,33 @@ Meteor.methods({
       console.log("error", "cannot save notification to integration bus");
       return false;
     }
+  },
+
+  registerPlatformUser: function(username, email) {
+    userId = Accounts.createUser({username: username, email: email, password:'exentriq'});
+    return userId;
+  },
+
+  loginPlatformUser: function(username, password) {
+    var future;
+    console.log('[methods] loginPlatformUser -> '.green, 'username:', username);
+    future = new Future();
+    HTTP.call('POST', 'http://exentriq.com/JSON-RPC', {
+      data: {
+        id: '',
+        method: 'auth.login',
+        params: [username, password]
+      }
+    }, function(error, result) {
+      console.log('Returned');
+      console.log(result);
+      if (JSON.parse(result.content).result) {
+        return future["return"](result);
+      } else {
+        return future["return"](null);
+      }
+    });
+    return future.wait();
   }
+
 });

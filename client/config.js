@@ -1,18 +1,8 @@
-
 // setup a new user spaceid for every new login
 var onSignFunc = function(error, state){
   if (!error) {
     if (state === "signIn") {
-      var spaceid = FlowRouter.getQueryParam('spaceid');
-      console.log(FlowRouter.getRouteName())
-      console.log(spaceid)
-      if(spaceid){
-        Users.update(Meteor.user()._id, {
-          $set: {
-            'profile.spaceId': spaceid
-          }
-        });
-      }
+      console.log('hello')
     }
     if (state === "signUp") {
       // Successfully registered
@@ -36,4 +26,16 @@ AccountsTemplates.addFields([
 
 Template.registerHelper('isStandalone', function(){
   return window.self === window.top;
+});
+
+FlowRouter.route('/dologin', {
+  action: function(params, queryParams) {
+    const username = queryParams.username;
+    Meteor.loginWithPassword(username, '', function(error){
+      if(!error)
+        FlowRouter.redirect('');
+      else
+        console.log('Sorry but you cannot do this.')
+    })
+  }
 });
