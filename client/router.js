@@ -1,4 +1,3 @@
-
 FlowRouter.route('/doLogin', {
   action: function(params, queryParams) {
     const sessionToken = queryParams.sessionToken;

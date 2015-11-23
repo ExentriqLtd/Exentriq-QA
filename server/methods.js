@@ -1,5 +1,6 @@
-// const CREATE_CARD_PATH = 'http://bus.stage.exentriq.com/api/cards/createCard';
-const CREATE_CARD_PATH = 'http://localhost:3000/api/cards/createCardFromQA';
+const ROOT_URL = process.env.ROOT_URL;
+
+const CREATE_CARD_PATH = ROOT_URL + '/api/cards/createCardFromQA';
 const AVATAR_PATH = 'http://talk.stage.exentriq.com/avatar';
 const INTEGRATION_BUS_PATH = "http://bus.stage.exentriq.com:1880";
 
