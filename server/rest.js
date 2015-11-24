@@ -51,13 +51,9 @@ Api.addRoute('user/:name', {authRequired: false}, {
  * @apiParam {String} [body] Body of the Post.
  * @apiParam {Number} status Status of the Post (1 - 2 - 3).
  * @apiParam {Boolean} [internal] Type of the Post. Public or Internal.
+ * @apiParam {String} [spaceId] Space in which the post is goin to be inserted.
  *
  * @apiSuccess {String} _id ID of the post.
- * @apiSuccess {String} title Title of the post.
- * @apiSuccess {Number} status Status of the post.
- * @apiSuccess {Number} commentsCount Number of comments of the post.
- * @apiSuccess {Boolean} internal Type of the post.
- * @apiSuccess {String} userId User or author of the post.
  */
 Api.addRoute('posts', {authRequired: false}, {
   get: function(){
@@ -72,7 +68,17 @@ Api.addRoute('posts', {authRequired: false}, {
     }
   },
   post: function(){
-    var id = Posts.insert(this.bodyParams);
+    var spaceId = this.bodyParams.spaceId;
+    delete this.bodyParams.spaceId;
+    if(spaceId !== ''){
+      var id = Posts.insert(this.bodyParams);
+      const space = Spaces.findOne({id: spaceId});
+      if(space){
+        Spaces.update(space._id, { $push: {posts: id }});
+      }else{
+        Spaces.insert({ posts: [id]});
+      }
+    }
     return {
       status: "success",
       _id: id

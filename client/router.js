@@ -1,7 +1,30 @@
+// ---------------------- Ensure user is logged in--------------------
+FlowRouter.triggers.enter([checkLoggedIn], {except: ["doLogin"]});
+
+function checkLoggedIn(ctx, redirect){
+  if(!Meteor.userId() && ctx.queryParams.sessionToken){
+    Session.set('sessionToken', ctx.queryParams.sessionToken);
+    Session.set('redirectTo', ctx.path);
+    redirect('/doLogin?sessionToken=' + ctx.queryParams.sessionToken);
+  }
+}
+
+function loginUser(username){
+  Meteor.logout();
+  Meteor.loginWithPassword(username, 'exentriq', function(error){
+    if(!error){
+      var redirectTo = Session.get('redirectTo') || '/';
+      FlowRouter.redirect(redirectTo);
+      Session.set('redirectTo', undefined);
+    }else
+      console.log('Sorry but you cannot do this.')
+  })
+}
+
 FlowRouter.route('/doLogin', {
+  name: 'doLogin',
   action: function(params, queryParams) {
     const sessionToken = queryParams.sessionToken;
-
     Meteor.call('verifyToken', sessionToken, function (error, result) {
       var data = result.data.result;
       if(data !== null){
@@ -21,11 +44,24 @@ FlowRouter.route('/doLogin', {
   }
 });
 
-function loginUser(username){
-  Meteor.loginWithPassword(username, 'exentriq', function(error){
-    if(!error)
-      FlowRouter.redirect('');
-    else
-      console.log('Sorry but you cannot do this.')
-  })
+// ------------------------ Handle spaceID ----------------------
+
+FlowRouter.triggers.enter([handleSpaceId], {except: ["doLogin"]});
+
+function handleSpaceId(ctx, redirect){
+  const spaceId = ctx.queryParams.spaceid;
+  if(!spaceId)
+    return;
+
+  // update user profile with spaceId to retrieve it later in post insertion
+  Users.update(Meteor.userId(),{
+    $set:{
+      'profile.spaceId': spaceId
+    }
+  });
+
+  // insert new post 
+  if(!Spaces.findOne({id: spaceId})){
+    Spaces.insert({id: spaceId});
+  }
 }
