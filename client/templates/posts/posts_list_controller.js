@@ -12,6 +12,11 @@ Template.posts_list_controller.helpers({
     var postsReady = template.rReady.get(); // ⚡ reactive ⚡
 
     var parameters = Posts.parameters.get(terms);
+
+    // Add the term internal
+    if(!Meteor.user()){
+      parameters.find.internal = false;
+    }
     
     // Add the term spaceid from queryParam
     parameters.find._id = { $in: [] };
