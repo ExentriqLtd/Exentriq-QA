@@ -1,5 +1,3 @@
-Meteor.subscribe('spaces');
-
 // When signing up with a spaceID param or field, it will be added to user profile space
 // id field 
 AccountsTemplates.addFields([

@@ -49,19 +49,21 @@ FlowRouter.route('/doLogin', {
 FlowRouter.triggers.enter([handleSpaceId], {except: ["doLogin"]});
 
 function handleSpaceId(ctx, redirect){
-  const spaceId = ctx.queryParams.spaceid;
-  if(!spaceId)
-    return;
+  Meteor.subscribe('spaces', function(){
+    const spaceId = ctx.queryParams.spaceid;
+    if(!spaceId)
+      return;
 
-  // update user profile with spaceId to retrieve it later in post insertion
-  Users.update(Meteor.userId(),{
-    $set:{
-      'profile.spaceId': spaceId
+    // update user profile with spaceId to retrieve it later in post insertion
+    Users.update(Meteor.userId(),{
+      $set:{
+        'profile.spaceId': spaceId
+      }
+    });
+    
+    // insert new post
+    if(!Spaces.findOne({id: ''+spaceId})){
+      Spaces.insert({id: spaceId});
     }
   });
-
-  // insert new post 
-  if(!Spaces.findOne({id: spaceId})){
-    Spaces.insert({id: spaceId});
-  }
 }
