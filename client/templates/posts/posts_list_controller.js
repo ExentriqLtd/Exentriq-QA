@@ -12,11 +12,14 @@ Template.posts_list_controller.helpers({
     var postsReady = template.rReady.get(); // ⚡ reactive ⚡
 
     var parameters = Posts.parameters.get(terms);
-
-    const space = Spaces.findOne({id: terms.spaceid});
-    if(space){
-      const postsInSpace = space.posts || [];
-      parameters.find = {_id: { $in: postsInSpace} }
+    
+    // Add the term spaceid from queryParam
+    parameters.find._id = { $in: [] };
+    if(terms.spaceid){
+      const space = Spaces.findOne({id: terms.spaceid});
+      if(space && space.posts){
+        parameters.find._id = { $in: space.posts };
+      }
     }
 
     var postsCursor = Posts.find(parameters.find, parameters.options);
