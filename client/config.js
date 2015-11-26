@@ -12,6 +12,11 @@ Template.registerHelper('isStandalone', function(){
   return window.self === window.top;
 });
 
+Template.registerHelper('backToEmaUrl', function(){
+	var postId = FlowRouter.getParam('_id');
+  return Posts.findOne(postId).backToMyRoots || false;
+});
+
 // setup a new user spaceid for every new login
 // var onSignFunc = function(error, state){
 //   if (!error) {

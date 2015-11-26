@@ -12,13 +12,13 @@ Meteor.methods({
 
     try {
       var result = HTTP.call('POST',
-        Meteor.settings.public.ema_url + '/createCardFromQA',
+        Meteor.settings.public.ema_url + '/newQARequest',
         {
           "data":{
             title: post.title,
             description: post.body,
             spaceId: spaceId,
-            internal: true,
+            //public: true,
             members: []
           }
         }

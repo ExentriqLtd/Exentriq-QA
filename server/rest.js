@@ -25,6 +25,7 @@ var Api = new Restivus({
  * @apiParam {Number} status Status of the Post (1 - 2 - 3).
  * @apiParam {Boolean} [internal] Type of the Post. Public or Internal.
  * @apiParam {String} [spaceId] Space in which the post is goin to be inserted.
+ * @apiParam {String} [backToMyRoots] The post origin url in EMA.
  *
  * @apiSuccess {String} _id ID of the post.
  */
@@ -49,7 +50,7 @@ Api.addRoute('posts', {authRequired: false}, {
       if(space){
         Spaces.update(space._id, { $push: {posts: id }});
       }else{
-        Spaces.insert({ posts: [id]});
+        Spaces.insert({ id:spaceId , posts: [id]});
       }
     }
     return {
