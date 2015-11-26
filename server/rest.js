@@ -5,36 +5,8 @@ var Api = new Restivus({
 });
 
 /**
- * @api {get} /user/:name Request User information
- * @apiName GetUser
- * @apiGroup User
- *
- * @apiParam {String} name Users unique Name.
- *
- * @apiSuccess {String} _id ID of the User.
- * @apiSuccess {String} username  Username of the User.
- * @apiSuccess {Object} profile  Profile of the User.
- *
- * @apiError UserNotFound The name of the User was not found.
- */
-Api.addRoute('user/:name', {authRequired: false}, {
-  get: function () {
-  	const user = Users.findOne({'profile.name':this.urlParams.name });
-  	if(user)
-      return {
-      	_id: user._id,
-      	username: user.username,
-      	profile: user.profile
-      }
-    else
-    	return {
-        error: 'User not found' 
-      };
-  }
-});
-
-/**
  * @api {get} /posts Request posts collection
+ * @apiVersion 0.1.0
  * @apiName GetPosts
  * @apiGroup Post
  *
@@ -44,6 +16,7 @@ Api.addRoute('user/:name', {authRequired: false}, {
 
 /**
  * @api {post} /posts Create new post
+ * @apiVersion 0.1.0
  * @apiName CreatePost
  * @apiGroup Post
  * 
@@ -88,6 +61,7 @@ Api.addRoute('posts', {authRequired: false}, {
 
 /**
  * @api {patch} /posts Update a post
+ * @apiVersion 0.1.0
  * @apiName UpdatePost
  * @apiGroup Post
  * 
@@ -102,7 +76,8 @@ Api.addRoute('posts', {authRequired: false}, {
  */
 
  /**
- * @api {posts} /posts Delete a post
+ * @api {post} /posts Delete a post
+ * @apiVersion 0.1.0
  * @apiName DeletePost
  * @apiGroup Post
  * 
@@ -137,16 +112,30 @@ Api.addRoute('posts/:id', {authRequired: false}, {
 // Comments collection routes
 Api.addCollection(Comments);
 
-Api.addRoute('users/createUser', {authRequired: false}, {
+/**
+ * @api {post} /users Create new user
+ * @apiVersion 0.1.0
+ * @apiName CreateUser
+ * @apiGroup User
+ * 
+ * @apiParam {String} username Username of the user.
+ * @apiParam {String} email Email of the user.
+ *
+ * @apiSuccess {String} _id ID of the new user.
+ */
+Api.addRoute('users', {authRequired: false}, {
   post: function() {
     try {
+      check(this.bodyParams.username, String);
+      check(this.bodyParams.email, String);
+
       var platformUsername = this.bodyParams.username;
       var platformEmail = this.bodyParams.email;
-      Meteor.call('registerPlatformUser', platformUsername, platformEmail, function (err, result) {
-      });
+      var id = Accounts.createUser({username: username, email: email, password:'exentriq'});
 
       return {
-        status: 'success'
+        status: 'success',
+        id: id
       };
     }
     catch(e) {
@@ -155,5 +144,35 @@ Api.addRoute('users/createUser', {authRequired: false}, {
         body: {status: 'fails', message: e.name + '::' + e.message}
       };
     }
+  }
+});
+
+/**
+ * @api {get} /user/:name Request User information
+ * @apiVersion 0.1.0
+ * @apiName GetUser
+ * @apiGroup User
+ *
+ * @apiParam {String} name Users unique Name.
+ *
+ * @apiSuccess {String} _id ID of the User.
+ * @apiSuccess {String} username  Username of the User.
+ * @apiSuccess {Object} profile  Profile of the User.
+ *
+ * @apiError UserNotFound No User match is found.
+ */
+Api.addRoute('user/:name', {authRequired: false}, {
+  get: function () {
+    const user = Users.findOne({'profile.name':this.urlParams.name });
+    if(user)
+      return {
+        _id: user._id,
+        username: user.username,
+        profile: user.profile
+      }
+    else
+      return {
+        error: 'User not found' 
+      };
   }
 });

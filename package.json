@@ -1,0 +1,8 @@
+{
+  "name": "exentriq-qa",
+  "version": "1.0.0",
+  "description": "An app for doing stuff efficiently.",
+  "scripts": {
+    "start": "meteor run -p 5000 --settings settings-development.json"
+  }
+}

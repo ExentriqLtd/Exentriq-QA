@@ -1,0 +1,7 @@
+{
+  "public": {
+  	"integration_bus_url": "http://bus.stage.exentriq.com:1880",
+    "ema_url": "http://localhost:3000/api/cards",
+    "stage_url": "http://stage.exentriq.com/JSON-RPC"
+  }
+}

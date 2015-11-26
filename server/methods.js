@@ -1,10 +1,3 @@
-const ROOT_URL = process.env.ROOT_URL;
-
-// const CREATE_CARD_PATH = 'localhost:3000/api/cards/createCardFromQA';
-const CREATE_CARD_PATH = 'http://boards.stage.exentriq.com/api/cards/createCardFromQA';
-const AVATAR_PATH = 'http://talk.stage.exentriq.com/avatar';
-const INTEGRATION_BUS_PATH = "http://bus.stage.exentriq.com:1880";
-
 const TYPE_POST = 1;
 const TYPE_COMMENT = 2;
 
@@ -16,15 +9,16 @@ Meteor.methods({
 
     const user = Users.findOne(post.userId);
     const spaceId = (user.profile.spaceId) ? user.profile.spaceId : '';
-    
+
     try {
       var result = HTTP.call('POST',
-        CREATE_CARD_PATH,
+        Meteor.settings.public.ema_url + '/createCardFromQA',
         {
           "data":{
             title: post.title,
             description: post.body,
             spaceId: spaceId,
+            internal: true,
             members: []
           }
         }
@@ -55,7 +49,7 @@ Meteor.methods({
 
     try {
       var result = HTTP.call("POST",
-        INTEGRATION_BUS_PATH, {
+        Meteor.settings.public.integration_bus_url, {
           data: {
             event: "Notification",
             id: "",
@@ -94,7 +88,7 @@ Meteor.methods({
   },
 
   verifyToken: function(token) {
-    var result = HTTP.call('POST', 'http://stage.exentriq.com/JSON-RPC', {
+    var result = HTTP.call('POST', Meteor.settings.public.stage_url, {
       data: {
         id: '',
         method: 'auth.loginBySessionToken',
