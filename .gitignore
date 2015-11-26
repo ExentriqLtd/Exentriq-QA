@@ -19,6 +19,7 @@ dump/
 dump/*
 
 settings.json
+settings-development.json
 settings.json.not-used
 .idea
 
