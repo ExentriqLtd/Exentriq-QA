@@ -12,11 +12,16 @@ Please refer to [the documentation](https://telescope.readme.io/docs/overview) f
 
 ### Run
 For development, check package.json
-Run 'npm start' (not meteor)
+
+Run with 'npm start' to pick the package.json (not meteor)
 
 ### Deploy
-To deploy the app on server, you need a file containing settings and a mupfile (settings.json)
+To deploy the app on server, you need a file containing settings and a mupfile (settings.json as a filename)
+
 mup init
+
 mup setup
+
 mup deploy
+
 check [Meteor up](https://github.com/arunoda/meteor-up)
