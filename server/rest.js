@@ -43,6 +43,7 @@ Api.addRoute('posts', {authRequired: false}, {
   },
   post: function(){
     var spaceId = this.bodyParams.spaceId;
+    console.log(spaceId)
     delete this.bodyParams.spaceId;
     if(spaceId !== ''){
       var id = Posts.insert(this.bodyParams);

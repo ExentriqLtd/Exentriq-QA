@@ -60,8 +60,10 @@ function handleSpaceId(ctx, redirect){
         'profile.spaceId': spaceId
       }
     });
+
+    Session.set('currentSpace', spaceId);
     
-    // insert new post
+    // insert new space
     if(!Spaces.findOne({id: ''+spaceId})){
       Spaces.insert({id: spaceId});
     }
