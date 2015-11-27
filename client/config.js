@@ -1,5 +1,5 @@
 // When signing up with a spaceID param or field, it will be added to user profile space
-// id field 
+// id field
 AccountsTemplates.addFields([
   {
     _id: "spaceId",
@@ -9,8 +9,11 @@ AccountsTemplates.addFields([
 ])
 
 Template.registerHelper('isStandalone', function(){
-  if(FlowRouter.getQueryParam('view') === 'support')
+  if(FlowRouter.getQueryParam('view') === 'support' || Session.get("supportView") == true) {
+    Session.set("supportView", true);
     return true;
+  }
+
   return window.self === window.top;
 });
 
