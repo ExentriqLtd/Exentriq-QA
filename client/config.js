@@ -9,11 +9,13 @@ AccountsTemplates.addFields([
 ])
 
 Template.registerHelper('isStandalone', function(){
+  if(FlowRouter.getQueryParam('view') === 'support')
+    return true;
   return window.self === window.top;
 });
 
 Template.registerHelper('backToEmaUrl', function(){
-  if(FlowRouter.getQueryParam('view=') === 'support')
+  if(FlowRouter.getQueryParam('view') === 'support')
     return false;
 	var postId = FlowRouter.getParam('_id');
 	var post = Posts.findOne(postId);
