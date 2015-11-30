@@ -4,7 +4,6 @@ const TYPE_COMMENT = 2;
 Meteor.methods({
   createCard: function (post) {
     check(post.title, String);
-    check(post.body, String);
     check(post.userId, String);
 
     const user = Users.findOne(post.userId);
@@ -12,11 +11,11 @@ Meteor.methods({
 
     try {
       var result = HTTP.call('POST',
-        Meteor.settings.public.ema_url + '/newQARequest',
+        Meteor.settings.public.ema_url + 'api/cards/newQARequest',
         {
           "data":{
             title: post.title,
-            description: post.body,
+            description: post.body || '',
             spaceId: spaceId,
             //public: true,
             members: []
@@ -61,7 +60,7 @@ Meteor.methods({
                   to: to,
                   subject: subject,
                   message: '',
-                  picture: AVATAR_PATH + from + '.jpg',
+                  picture: Meteor.settings.public.avatar_path + from + '.jpg',
                   link: link
                 }
               }

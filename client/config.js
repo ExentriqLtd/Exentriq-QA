@@ -9,11 +9,10 @@ AccountsTemplates.addFields([
 ])
 
 Template.registerHelper('isStandalone', function(){
-  if(FlowRouter.getQueryParam('view') === 'support' || Session.get("supportView") == true) {
-    Session.set("supportView", true);
+  if(FlowRouter.getQueryParam('view') === 'support' || Session.get('view') === 'support') {
+    Session.set('view', 'support');
     return true;
   }
-
   return window.self === window.top;
 });
 

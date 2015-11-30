@@ -51,8 +51,12 @@ FlowRouter.triggers.enter([handleSpaceId], {except: ["doLogin"]});
 function handleSpaceId(ctx, redirect){
   Meteor.subscribe('spaces', function(){
     const spaceId = ctx.queryParams.spaceid;
-    if(!spaceId)
+    
+    if(!spaceId){
+      if(Meteor.user().profile.spaceId)
+        FlowRouter.setQueryParams({ spaceid: Meteor.user().profile.spaceId })
       return;
+    }
 
     // update user profile with spaceId to retrieve it later in post insertion
     Users.update(Meteor.userId(),{
