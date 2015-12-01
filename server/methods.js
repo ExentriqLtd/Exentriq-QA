@@ -11,7 +11,7 @@ Meteor.methods({
 
     try {
       var result = HTTP.call('POST',
-        Meteor.settings.public.ema_url + 'api/cards/newQARequest',
+        Meteor.settings.public.ema_url + '/api/cards/newQARequest',
         {
           "data":{
             title: post.title,

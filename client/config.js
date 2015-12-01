@@ -17,7 +17,8 @@ Template.registerHelper('isStandalone', function(){
 });
 
 Template.registerHelper('backToEmaUrl', function(){
-  if(FlowRouter.getQueryParam('view') === 'support')
+  if(FlowRouter.getQueryParam('view') === 'support' ||
+      FlowRouter.getRouteName() !== 'postsDefault')
     return false;
 	var postId = FlowRouter.getParam('_id');
 	var post = Posts.findOne(postId);

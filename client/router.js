@@ -37,8 +37,7 @@ FlowRouter.route('/doLogin', {
             Meteor.call('registerPlatformUser', username, email, function (error, result) {});
           }
         })
-      }
-      else
+      }else
         console.log('invalid token, please contact the administrator');
     });
   }

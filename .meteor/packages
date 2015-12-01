@@ -29,7 +29,7 @@ telescope:share
 # telescope:sitemap
 telescope:spiderable
 telescope:tagline-banner
-telescope:tags
+# telescope:tags
 telescope:theme-base
 telescope:theme-hubble
 telescope:update-prompt
