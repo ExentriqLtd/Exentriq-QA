@@ -5,15 +5,17 @@
       {{{icon "menu"}}}
     </a>
 
-    {{#if backToEmaUrl}}
-      <a href="{{backToEmaUrl}}">
-        <i class="fa fa-chevron-left fa-2x"></i>
-      </a>
-    {{/if}}
+    {{#unless isExentriqSupport}}
+      {{#if backToEmaUrl}}
+        <a href="{{backToEmaUrl}}">
+          <i class="fa fa-chevron-left fa-2x"></i>
+        </a>
+      {{/if}}
+    {{/unless}}
 
     {{> logo}}
 
-    {{#if isStandalone}}
+    {{#if showFullNav }}
       {{#if hasPrimaryNav}}
         {{> modules zone="primaryNav" zoneClass="nav primary-nav desktop-nav header-module desktop-only" moduleClass="header-submodule"}}
       {{/if}}

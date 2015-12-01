@@ -8,7 +8,7 @@ AccountsTemplates.addFields([
   }
 ])
 
-Template.registerHelper('isStandalone', function(){
+Template.registerHelper('showFullNav', function(){
   if(FlowRouter.getQueryParam('view') === 'support' || Session.get('view') === 'support') {
     Session.set('view', 'support');
     return true;
@@ -16,9 +16,14 @@ Template.registerHelper('isStandalone', function(){
   return window.self === window.top;
 });
 
+Template.registerHelper('isExentriqSupport', function(){
+  if(FlowRouter.getQueryParam('view') === 'support' || Session.get('view') === 'support') {
+    Session.set('view', 'support');
+    return true;
+  }
+});
+
 Template.registerHelper('backToEmaUrl', function(){
-  if(FlowRouter.getQueryParam('view') === 'support')
-    return false;
 	var postId = FlowRouter.getParam('_id');
 	var post = Posts.findOne(postId);
 	if(post && post.backToMyRoots) {
@@ -30,19 +35,3 @@ Template.registerHelper('backToEmaUrl', function(){
     return Session.get('post.backToMyRoots');
   }
 });
-
-// setup a new user spaceid for every new login
-// var onSignFunc = function(error, state){
-//   if (!error) {
-//     if (state === "signIn") {
-//       console.log('hello')
-//     }
-//     if (state === "signUp") {
-//       // Successfully registered
-//     }
-//   }
-// };
-
-// AccountsTemplates.configure({
-//     onSubmitHook: onSignFunc
-// });

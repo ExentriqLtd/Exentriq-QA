@@ -2,7 +2,13 @@
 FlowRouter.triggers.enter([checkLoggedIn], {except: ["doLogin"]});
 
 function checkLoggedIn(ctx, redirect){
-  if(!Meteor.userId() && ctx.queryParams.sessionToken){
+  const sessionToken = ctx.queryParams.sessionToken;
+  if(!sessionToken)
+    return;
+  else if(sessionToken === '-1'){
+    Meteor.logout();
+    return;
+  }else if(!Meteor.userId()){
     Session.set('sessionToken', ctx.queryParams.sessionToken);
     Session.set('redirectTo', ctx.path);
     redirect('/doLogin?sessionToken=' + ctx.queryParams.sessionToken);
@@ -52,8 +58,8 @@ function handleSpaceId(ctx, redirect){
     const spaceId = ctx.queryParams.spaceid;
     
     if(!spaceId){
-      if(Meteor.user() && Meteor.user().profile && Meteor.user().profile.spaceId)
-        FlowRouter.setQueryParams({ spaceid: Meteor.user().profile.spaceId })
+      if(Session.get('currentSpace'))
+        FlowRouter.setQueryParams({ spaceid: Session.get('currentSpace') })
       return;
     }
 
@@ -71,4 +77,22 @@ function handleSpaceId(ctx, redirect){
       Spaces.insert({id: spaceId});
     }
   });
+}
+
+// ------------------------ Handle Extra CSS ----------------------
+
+FlowRouter.triggers.enter([handleExtraCSS], {except: ["doLogin"]});
+
+function handleExtraCSS(ctx, redirect){
+  const extraCSSLink = ctx.queryParams.ccc;
+  if(extraCSSLink){
+    HTTP.get(extraCSSLink, function(error, result){
+      if(!error){
+        Meteor.call('setExtraCSS', extraCSS, function (error, result) {
+          if(!error)
+            console.log('setting extra css from url: ' + extraCSS)
+        });
+      }
+    });
+  }
 }

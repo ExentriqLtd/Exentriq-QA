@@ -96,6 +96,15 @@ Meteor.methods({
     });
 
     return result;
+  },
+
+  setExtraCSS: function(extraCSS){
+    const id = Settings.find().fetch()[0]._id;
+    Settings.update(id, {
+      $set: {
+        extraCSS: extraCSS
+      }
+    });
   }
 
 });
