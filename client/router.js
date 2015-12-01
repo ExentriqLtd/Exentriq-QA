@@ -52,7 +52,7 @@ function handleSpaceId(ctx, redirect){
     const spaceId = ctx.queryParams.spaceid;
     
     if(!spaceId){
-      if(Meteor.user().profile.spaceId)
+      if(Meteor.user() && Meteor.user().profile && Meteor.user().profile.spaceId)
         FlowRouter.setQueryParams({ spaceid: Meteor.user().profile.spaceId })
       return;
     }

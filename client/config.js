@@ -29,7 +29,6 @@ Template.registerHelper('backToEmaUrl', function(){
   if(FlowRouter.getRouteName() == 'postsDefault' && Session.get('post.backToMyRoots')){
     return Session.get('post.backToMyRoots');
   }
-
 });
 
 // setup a new user spaceid for every new login
