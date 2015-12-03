@@ -48,7 +48,7 @@ Meteor.methods({
 
     try {
       var result = HTTP.call("POST",
-        Meteor.settings.public.integration_bus_url, {
+        Meteor.settings.public.integration_bus_url + '/createEvent', {
           data: {
             event: "Notification",
             id: "",
@@ -67,6 +67,8 @@ Meteor.methods({
             ]
           }
         });
+
+      console.log(result)
 
       return true;
     }catch(e){
@@ -98,13 +100,21 @@ Meteor.methods({
     return result;
   },
 
-  setExtraCSS: function(extraCSS){
-    const id = Settings.find().fetch()[0]._id;
-    Settings.update(id, {
-      $set: {
-        extraCSS: extraCSS
-      }
-    });
+  setExtraCSS: function(extraCSSUrl){
+    check(extraCSSUrl, String);
+    
+    var content = HTTP.get(extraCSSUrl).content;
+    if(!content)
+      return false;
+
+    const settings = Settings.find().fetch()[0];
+    const property = { extraCSS: content }
+    if(!settings){
+      Settings.insert(property);
+    }else{
+      Settings.update(settings._id, { $set: property });
+    }
   }
 
 });
+

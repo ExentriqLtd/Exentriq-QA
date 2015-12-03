@@ -16,22 +16,23 @@ Template.registerHelper('showFullNav', function(){
   return window.self === window.top;
 });
 
-Template.registerHelper('isExentriqSupport', function(){
+Template.registerHelper('isExentriqSupportOrStandalone', function(){
   if(FlowRouter.getQueryParam('view') === 'support' || Session.get('view') === 'support') {
     Session.set('view', 'support');
     return true;
   }
+  return window.self === window.top;
 });
 
 Template.registerHelper('backToEmaUrl', function(){
 	var postId = FlowRouter.getParam('_id');
 	var post = Posts.findOne(postId);
-	if(post && post.backToMyRoots) {
+	if(post && post.backToMyRoots){
     // We persist the back url in the session to enable back to ema link in app wide
     Session.set('post.backToMyRoots', post.backToMyRoots);
-		return false;
+		return post.backToMyRoots;
   }
-  if(FlowRouter.getRouteName() == 'postsDefault' && Session.get('post.backToMyRoots')){
+  if(Session.get('post.backToMyRoots')){
     return Session.get('post.backToMyRoots');
   }
 });

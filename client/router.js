@@ -84,15 +84,11 @@ function handleSpaceId(ctx, redirect){
 FlowRouter.triggers.enter([handleExtraCSS], {except: ["doLogin"]});
 
 function handleExtraCSS(ctx, redirect){
-  const extraCSSLink = ctx.queryParams.ccc;
+  const extraCSSLink = ctx.queryParams.css;
   if(extraCSSLink){
-    HTTP.get(extraCSSLink, function(error, result){
-      if(!error){
-        Meteor.call('setExtraCSS', extraCSS, function (error, result) {
-          if(!error)
-            console.log('setting extra css from url: ' + extraCSS)
-        });
-      }
+    Meteor.call('setExtraCSS', extraCSSLink, function (error, result) {
+      if(!error)
+        console.log('setting extra css from url: ' + extraCSSLink)
     });
   }
 }
