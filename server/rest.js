@@ -164,7 +164,7 @@ Api.addRoute('users', {authRequired: false}, {
  */
 Api.addRoute('user/:name', {authRequired: false}, {
   get: function () {
-    const user = Users.findOne({'profile.name':this.urlParams.name });
+    const user = Users.findOne({ username:this.urlParams.name });
     if(user)
       return {
         _id: user._id,
