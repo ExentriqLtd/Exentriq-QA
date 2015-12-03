@@ -1,0 +1,8 @@
+<template name="custom_post_submit">
+  <div class="form-page post-submit">
+    <div class="grid grid-module">
+      {{> quickForm collection="Posts" id="submitPostForm" template="bootstrap3-horizontal" input-col-class="controls" type="method" meteormethod="submitPost" fields=postFields}}
+    	<a href='/' class="btn btn-cancel">Cancel</a>
+    </div>
+  </div>
+</template>
