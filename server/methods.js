@@ -87,7 +87,7 @@ Meteor.methods({
   },
 
   verifyToken: function(token) {
-    var result = HTTP.call('POST', Meteor.settings.public.stage_url, {
+    var result = HTTP.call('POST', Meteor.settings.public.stage_url + '/JSON-RPC', {
       data: {
         id: '',
         method: 'auth.loginBySessionToken',
