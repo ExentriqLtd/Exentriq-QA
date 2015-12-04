@@ -8,7 +8,9 @@ function checkLoggedIn(ctx, redirect){
   else if(sessionToken === '-1'){
     Meteor.logout();
     return;
-  }else if(!Meteor.userId()){
+  }else{
+    if(Meteor.userId())
+      Meteor.logout();
     Session.set('sessionToken', ctx.queryParams.sessionToken);
     Session.set('redirectTo', ctx.path);
     redirect('/doLogin?sessionToken=' + ctx.queryParams.sessionToken);
