@@ -24,6 +24,10 @@ Template.registerHelper('isExentriqSupportOrStandalone', function(){
   return window.self === window.top;
 });
 
+Template.registerHelper('isStandalone', function(){
+  return window.self === window.top;
+});
+
 Template.registerHelper('backToEmaUrl', function(){
 	var postId = FlowRouter.getParam('_id');
 	var post = Posts.findOne(postId);
