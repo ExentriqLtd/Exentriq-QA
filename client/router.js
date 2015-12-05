@@ -1,6 +1,12 @@
 // ---------------------- Ensure user is logged in--------------------
 FlowRouter.triggers.enter([checkLoggedIn], {except: ["doLogin"]});
 
+function redirectToLogin(sessionToken, path){
+  Session.set('sessionToken', sessionToken);
+  Session.set('redirectTo', path);
+  FlowRouter.redirect('/doLogin?sessionToken=' + sessionToken);
+}
+
 function checkLoggedIn(ctx, redirect){
   const sessionToken = ctx.queryParams.sessionToken;
   if(!sessionToken)
@@ -8,17 +14,17 @@ function checkLoggedIn(ctx, redirect){
   else if(sessionToken === '-1'){
     Meteor.logout();
     return;
-  }else{
-    if(Meteor.userId())
-      Meteor.logout();
-    Session.set('sessionToken', ctx.queryParams.sessionToken);
-    Session.set('redirectTo', ctx.path);
-    redirect('/doLogin?sessionToken=' + ctx.queryParams.sessionToken);
+  }
+
+  if(!Meteor.user()){
+    redirectToLogin(sessionToken, ctx.path)
+  }else if(sessionToken !== Session.get('sessionToken')) {
+    Meteor.logout();
+    redirectToLogin(sessionToken, ctx.path)
   }
 }
 
 function loginUser(username){
-  Meteor.logout();
   Meteor.loginWithPassword(username, 'exentriq', function(error){
     if(!error){
       var redirectTo = Session.get('redirectTo') || '/';
