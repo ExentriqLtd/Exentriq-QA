@@ -7,6 +7,7 @@ Meteor.methods({
     check(post.userId, String);
 
     const user = Users.findOne(post.userId);
+    const public = (user.profile.external) ? 'yes' : '';
     const spaceId = (user.profile.spaceId) ? user.profile.spaceId : '';
 
     try {
@@ -18,7 +19,7 @@ Meteor.methods({
             description: post.body || '',
             spaceId: spaceId,
             fromAccount: user.username,
-            //public: true,
+            public: public,
             members: []
           }
         }
@@ -32,8 +33,16 @@ Meteor.methods({
     }
   },
 
-  registerPlatformUser: function(username, email) {
-    userId = Accounts.createUser({username: username, email: email, password:'exentriq'});
+  registerPlatformUser: function(username, email, external) {
+    userId = Accounts.createUser({
+      username: username,
+      email: email,
+      password: 'exentriq'
+    });
+
+    if(external)
+      Users.update(userId,{ $set:{ 'profile.external': external } });
+
     return userId;
   },
 

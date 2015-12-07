@@ -42,13 +42,19 @@ FlowRouter.route('/doLogin', {
     Meteor.call('verifyToken', sessionToken, function (error, result) {
       var data = result.data.result;
       if(data !== null){
+        console.log(data)
         var username = data.username,
-            email = data.email;
+            email = data.email,
+            external = data.type === 'EXTERNAL';
         Meteor.call('findUserByName', data.username, function(error, result){
           if(!error && result !== undefined){
             loginUser(username);
           }else{
-            Meteor.call('registerPlatformUser', username, email, function (error, result) {});
+            Meteor.call('registerPlatformUser', username, email, external,
+            function (error, result) {
+              var redirectTo = Session.get('redirectTo') || '/';
+              FlowRouter.redirect(redirectTo);
+            });
           }
         })
       }else
