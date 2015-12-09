@@ -26,6 +26,7 @@ function checkLoggedIn(ctx, redirect){
 
 function loginUser(username){
   Meteor.loginWithPassword(username, 'exentriq', function(error){
+    console.log(error)
     if(!error){
       var redirectTo = Session.get('redirectTo') || '/';
       FlowRouter.redirect(redirectTo);
@@ -42,7 +43,6 @@ FlowRouter.route('/doLogin', {
     Meteor.call('verifyToken', sessionToken, function (error, result) {
       var data = result.data.result;
       if(data !== null){
-        console.log(data)
         var username = data.username,
             email = data.email,
             external = data.type === 'EXTERNAL';
