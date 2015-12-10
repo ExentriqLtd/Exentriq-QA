@@ -1,71 +1,60 @@
 // ---------------------- Ensure user is logged in--------------------
-FlowRouter.triggers.enter([checkLoggedIn], {except: ["doLogin"]});
-
-function redirectToLogin(sessionToken, path){
-  Session.set('sessionToken', sessionToken);
-  Session.set('redirectTo', path);
-  FlowRouter.redirect('/doLogin?sessionToken=' + sessionToken);
-}
+FlowRouter.triggers.enter([checkLoggedIn]);
 
 function checkLoggedIn(ctx, redirect){
   const sessionToken = ctx.queryParams.sessionToken;
   if(!sessionToken)
     return;
-  else if(sessionToken === '-1'){
-    Meteor.logout();
-    return;
-  }
-
-  if(!Meteor.user()){
-    redirectToLogin(sessionToken, ctx.path)
-  }else if(sessionToken !== Session.get('sessionToken')) {
-    Meteor.logout();
-    redirectToLogin(sessionToken, ctx.path)
+  
+  Session.set('isLoggingIn', true)
+  if(sessionToken === '-1'){
+    Meteor.logout(function(){
+      Session.set('isLoggingIn', false);
+    });
+  }else{
+    Session.set('sessionToken', sessionToken);
+    // remove the session token from query params, otherwise this causes 
+    // infinite redirects
+    FlowRouter.setQueryParams({ sessionToken: undefined })
+    verifyToken(sessionToken, ctx.path);
   }
 }
 
-function loginUser(username){
-  Meteor.loginWithPassword(username, 'exentriq', function(error){
-    console.log(error)
-    if(!error){
-      var redirectTo = Session.get('redirectTo') || '/';
-      FlowRouter.redirect(redirectTo);
-      Session.set('redirectTo', undefined);
+function verifyToken(sessionToken, redirectTo){
+  Meteor.call('verifyToken', sessionToken, function (error, result) {
+    var data = result.data.result;
+    if(data !== null){
+      var username = data.username,
+          email = data.email,
+          external = (data.type === 'EXTERNAL');
+      Meteor.call('findUserByName', data.username, function(error, result){
+        if(!error && result !== undefined){
+          loginUser(username, redirectTo);
+        }else{
+          Meteor.call('registerPlatformUser', username, email, external, function (error, result) {
+            FlowRouter.redirect('/');
+          });
+        }
+        Session.set('isLoggingIn', false);
+      })
     }else
-      console.log('Sorry but you cannot do this.')
+      console.log('invalid token, please contact the administrator');
+  });
+}
+
+function loginUser(username, redirectTo){
+  Meteor.loginWithPassword(username, 'exentriq', function(error){
+    if(error){
+      console.log(error);
+      return;
+    }
+    FlowRouter.redirect('/');
   })
 }
 
-FlowRouter.route('/doLogin', {
-  name: 'doLogin',
-  action: function(params, queryParams) {
-    const sessionToken = queryParams.sessionToken;
-    Meteor.call('verifyToken', sessionToken, function (error, result) {
-      var data = result.data.result;
-      if(data !== null){
-        var username = data.username,
-            email = data.email,
-            external = data.type === 'EXTERNAL';
-        Meteor.call('findUserByName', data.username, function(error, result){
-          if(!error && result !== undefined){
-            loginUser(username);
-          }else{
-            Meteor.call('registerPlatformUser', username, email, external,
-            function (error, result) {
-              var redirectTo = Session.get('redirectTo') || '/';
-              FlowRouter.redirect(redirectTo);
-            });
-          }
-        })
-      }else
-        console.log('invalid token, please contact the administrator');
-    });
-  }
-});
-
 // ------------------------ Handle spaceID ----------------------
 
-FlowRouter.triggers.enter([handleSpaceId], {except: ["doLogin"]});
+FlowRouter.triggers.enter([handleSpaceId]);
 
 function handleSpaceId(ctx, redirect){
   Meteor.subscribe('spaces', function(){
@@ -95,14 +84,16 @@ function handleSpaceId(ctx, redirect){
 
 // ------------------------ Handle Extra CSS ----------------------
 
-FlowRouter.triggers.enter([handleExtraCSS], {except: ["doLogin"]});
+FlowRouter.triggers.enter([handleExtraCSS]);
 
 function handleExtraCSS(ctx, redirect){
   const extraCSSLink = ctx.queryParams.css;
   if(extraCSSLink){
     Meteor.call('setExtraCSS', extraCSSLink, function (error, result) {
-      if(!error)
-        console.log('setting extra css from url: ' + extraCSSLink)
+      if(!error){
+        FlowRouter.setQueryParams({ css: undefined })
+        console.log('setting extra css from url: ' + extraCSSLink);
+      }
     });
   }
 }

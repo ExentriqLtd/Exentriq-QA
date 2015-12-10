@@ -7,7 +7,7 @@ Template.submit_button.helpers({
   		}
   	}else{
   		return {
-  			href: "submit"
+  			href: "/submit"
   		};
   	}
   }
