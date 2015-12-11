@@ -15,8 +15,9 @@ function checkLoggedIn(ctx, redirect){
     Session.set('sessionToken', sessionToken);
     // remove the session token from query params, otherwise this causes 
     // infinite redirects
-    FlowRouter.setQueryParams({ sessionToken: undefined })
-    verifyToken(sessionToken, ctx.path);
+    FlowRouter.setQueryParams({ sessionToken: undefined });
+    console.log(FlowRouter._current.path)
+    verifyToken(sessionToken, FlowRouter._current.path);
   }
 }
 
@@ -32,7 +33,7 @@ function verifyToken(sessionToken, redirectTo){
           loginUser(username, redirectTo);
         }else{
           Meteor.call('registerPlatformUser', username, email, external, function (error, result) {
-            FlowRouter.redirect('/');
+            FlowRouter.redirect(redirectTo);
           });
         }
         Session.set('isLoggingIn', false);
@@ -48,7 +49,7 @@ function loginUser(username, redirectTo){
       console.log(error);
       return;
     }
-    FlowRouter.redirect('/');
+    FlowRouter.redirect(redirectTo);
   })
 }
 
@@ -88,7 +89,7 @@ FlowRouter.triggers.enter([handleExtraCSS]);
 
 function handleExtraCSS(ctx, redirect){
   const extraCSSLink = ctx.queryParams.css;
-  if(extraCSSLink){
+  if(extraCSSLink && !Session.get('isLoggingIn')){
     Meteor.call('setExtraCSS', extraCSSLink, function (error, result) {
       if(!error){
         FlowRouter.setQueryParams({ css: undefined })
