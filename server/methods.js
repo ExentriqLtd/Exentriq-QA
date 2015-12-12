@@ -16,6 +16,7 @@ Meteor.methods({
         {
           "data":{
             title: post.title,
+            qaId: post._id,
             description: post.body || '',
             spaceId: spaceId,
             fromAccount: user.username,
@@ -64,7 +65,7 @@ Meteor.methods({
 
   setExtraCSS: function(extraCSSUrl){
     check(extraCSSUrl, String);
-    
+
     var content = HTTP.get(extraCSSUrl).content;
     if(!content)
       return false;
