@@ -9,7 +9,10 @@ Meteor.methods({
     const user = Users.findOne(post.userId);
     const public = (user.profile.external) ? 'yes' : '';
     const spaceId = (user.profile.spaceId) ? user.profile.spaceId : '';
-    var comments = Comments.find({postId: post._id}, {fields: {body: 1, author: 1, postId: 1}}).fetch();
+    var comments =
+      Comments.find({postId: post._id},
+        {fields: {body: 1, author: 1, postId: 1, postedAt: 1}},
+        {sort: {postedAt: -1}}).fetch();
 
     try {
       var result = HTTP.call('POST',
