@@ -2,21 +2,17 @@ const TYPE_POST = 1;
 const TYPE_COMMENT = 2;
 
 Meteor.methods({
-  syncCard: function (post) {
+  createCard: function (post) {
     check(post.title, String);
     check(post.userId, String);
 
     const user = Users.findOne(post.userId);
     const public = (user.profile.external) ? 'yes' : '';
     const spaceId = (user.profile.spaceId) ? user.profile.spaceId : '';
-    var comments =
-      Comments.find({postId: post._id},
-        {fields: {body: 1, author: 1, postId: 1, postedAt: 1}},
-        {sort: {postedAt: -1}}).fetch();
 
     try {
       var result = HTTP.call('POST',
-        Meteor.settings.public.ema_url + '/api/cards/syncQARequest',
+        Meteor.settings.public.ema_url + '/api/cards/newQARequest',
         {
           "data":{
             title: post.title,
@@ -25,8 +21,32 @@ Meteor.methods({
             spaceId: spaceId,
             fromAccount: user.username,
             public: public,
-            members: [],
-            comments: comments
+            members: []
+          }
+        }
+      );
+
+      return true;
+    }catch(e){
+      // Got a network error, time-out or HTTP error in the 400 or 500 range.
+      console.log("error", e);
+      return false;
+    }
+  },
+
+  syncCardComments: function(comment){
+    check(comment.body, String);
+    check(comment.postId, String);
+    check(comment.author, String);
+
+    try {
+      var result = HTTP.call('POST',
+        Meteor.settings.public.ema_url + '/api/cards/syncCommentsForQARequest',
+        {
+          "data":{
+            qaId: comment.postId,
+            comment: comment.body,
+            author: comment.author
           }
         }
       );
