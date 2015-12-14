@@ -5,7 +5,7 @@ function checkLoggedIn(ctx, redirect){
   const sessionToken = ctx.queryParams.sessionToken;
   if(!sessionToken)
     return;
-  
+
   Session.set('isLoggingIn', true)
   if(sessionToken === '-1'){
     Meteor.logout(function(){
@@ -13,7 +13,7 @@ function checkLoggedIn(ctx, redirect){
     });
   }else{
     Session.set('sessionToken', sessionToken);
-    // remove the session token from query params, otherwise this causes 
+    // remove the session token from query params, otherwise this causes
     // infinite redirects
     FlowRouter.setQueryParams({ sessionToken: undefined })
     verifyToken(sessionToken, ctx.path);
@@ -22,21 +22,11 @@ function checkLoggedIn(ctx, redirect){
 
 function verifyToken(sessionToken, redirectTo){
   Meteor.call('verifyToken', sessionToken, function (error, result) {
-    var data = result.data.result;
-    if(data !== null){
-      var username = data.username,
-          email = data.email,
-          external = (data.type === 'EXTERNAL');
-      Meteor.call('findUserByName', data.username, function(error, result){
-        if(!error && result !== undefined){
-          loginUser(username, redirectTo);
-        }else{
-          Meteor.call('registerPlatformUser', username, email, external, function (error, result) {
-            FlowRouter.redirect('/');
-          });
-        }
-        Session.set('isLoggingIn', false);
-      })
+    var userData = result;
+    console.log(error);
+    if(userData){
+      loginUser(userData.username, redirectTo);
+      Session.set('isLoggingIn', false);
     }else
       console.log('invalid token, please contact the administrator');
   });
@@ -59,7 +49,7 @@ FlowRouter.triggers.enter([handleSpaceId]);
 function handleSpaceId(ctx, redirect){
   Meteor.subscribe('spaces', function(){
     const spaceId = ctx.queryParams.spaceid;
-    
+
     if(!spaceId){
       if(Session.get('currentSpace'))
         FlowRouter.setQueryParams({ spaceid: Session.get('currentSpace') })
@@ -74,7 +64,7 @@ function handleSpaceId(ctx, redirect){
     });
 
     Session.set('currentSpace', spaceId);
-    
+
     // insert new space
     if(!Spaces.findOne({id: ''+spaceId})){
       Spaces.insert({id: spaceId});

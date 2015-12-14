@@ -54,6 +54,9 @@ Meteor.methods({
   },
 
   verifyToken: function(token) {
+    check(token, String);
+
+    // Try to retrieve user data from auth API
     var result = HTTP.call('POST', Meteor.settings.public.platform_url + '/JSON-RPC', {
       data: {
         id: '',
@@ -62,7 +65,22 @@ Meteor.methods({
       }
     });
 
-    return result;
+    var userData = result.data.result;
+
+
+    if (userData) {
+      // If user not existing in Meteor, create user
+      if(!Meteor.users.findOne({username: userData.username}, { fields: {_id: 1}})) {
+        Accounts.createUser({username: userData.username, email: userData.email, password:'exentriq'});
+      }
+
+      // In any case, as long as we got a response from the auth API, just return this user data
+      return userData;
+    }
+
+    // No user was retrieved from the auth API
+    return null;
+
   },
 
   setExtraCSS: function(extraCSSUrl){
