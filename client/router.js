@@ -26,9 +26,10 @@ function verifyToken(sessionToken, redirectTo){
     console.log(error);
     if(userData){
       loginUser(userData.username, redirectTo);
-      Session.set('isLoggingIn', false);
-    }else
+    }else{
       console.log('invalid token, please contact the administrator');
+    }
+    Session.set('isLoggingIn', false);
   });
 }
 
