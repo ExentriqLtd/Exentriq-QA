@@ -18,6 +18,7 @@ Meteor.methods({
             title: post.title,
             qaId: post._id,
             description: post.body || '',
+            qaId: post._id,
             spaceId: spaceId,
             fromAccount: user.username,
             public: public,
@@ -29,7 +30,32 @@ Meteor.methods({
       return true;
     }catch(e){
       // Got a network error, time-out or HTTP error in the 400 or 500 range.
-      console.log("error", e)
+      console.log("error", e);
+      return false;
+    }
+  },
+
+  syncCardComments: function(comment){
+    check(comment.body, String);
+    check(comment.postId, String);
+    check(comment.author, String);
+
+    try {
+      var result = HTTP.call('POST',
+        Meteor.settings.public.ema_url + '/api/cards/syncCommentsForQARequest',
+        {
+          "data":{
+            qaId: comment.postId,
+            comment: comment.body,
+            author: comment.author
+          }
+        }
+      );
+
+      return true;
+    }catch(e){
+      // Got a network error, time-out or HTTP error in the 400 or 500 range.
+      console.log("error", e);
       return false;
     }
   },
@@ -52,6 +78,9 @@ Meteor.methods({
   },
 
   verifyToken: function(token) {
+    check(token, String);
+
+    // Try to retrieve user data from auth API
     var result = HTTP.call('POST', Meteor.settings.public.platform_url + '/JSON-RPC', {
       data: {
         id: '',
@@ -60,7 +89,22 @@ Meteor.methods({
       }
     });
 
-    return result;
+    var userData = result.data.result;
+
+
+    if (userData) {
+      // If user not existing in Meteor, create user
+      if(!Meteor.users.findOne({username: userData.username}, { fields: {_id: 1}})) {
+        Accounts.createUser({username: userData.username, email: userData.email, password:'exentriq'});
+      }
+
+      // In any case, as long as we got a response from the auth API, just return this user data
+      return userData;
+    }
+
+    // No user was retrieved from the auth API
+    return null;
+
   },
 
   setExtraCSS: function(extraCSSUrl){
@@ -77,6 +121,13 @@ Meteor.methods({
     }else{
       Settings.update(settings._id, { $set: property });
     }
+  },
+
+  appendEmaLink: function(postId) {
+    check(postId, String);
+    /*Posts.update(postId, {
+      $set:
+    });*/
   }
 
 });
