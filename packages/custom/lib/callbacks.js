@@ -2,7 +2,7 @@ const TYPE_POST = 1;
 const TYPE_COMMENT = 2;
 
 function createCardOnPostSubmitClient (post) {
-	Meteor.call('createCard', post);
+	Meteor.call('syncCard', post);
 }
 
 function sendNotificationOnPostSubmitClient(post){
