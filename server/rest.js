@@ -19,7 +19,7 @@ var Api = new Restivus({
  * @apiVersion 0.1.0
  * @apiName CreatePost
  * @apiGroup Post
- * 
+ *
  * @apiParam {String} title Title of the Post.
  * @apiParam {String} [body] Body of the Post.
  * @apiParam {Number} status Status of the Post (1 - 2 - 3).
@@ -65,7 +65,7 @@ Api.addRoute('posts', {authRequired: false}, {
  * @apiVersion 0.1.0
  * @apiName UpdatePost
  * @apiGroup Post
- * 
+ *
  * @apiParam {String} id ID of the Post.
  *
  * @apiParam {String} title Title of the Post.
@@ -81,15 +81,15 @@ Api.addRoute('posts', {authRequired: false}, {
  * @apiVersion 0.1.0
  * @apiName DeletePost
  * @apiGroup Post
- * 
+ *
  * @apiParam {String} id ID of the Post.
- * 
+ *
  * @apiSuccess {String} _id ID of the post.
  */
 Api.addRoute('posts/:id', {authRequired: false}, {
   patch: function () {
     // remove all comments for this post
-    // This call will then reinsert all the commments 
+    // This call will then reinsert all the commments
     var comments = _.pluck(Comments.find({postId: this.urlParams.id}).fetch(), '_id');
     _.each(comments, function(element, index){
       Comments.remove(element);
@@ -111,14 +111,53 @@ Api.addRoute('posts/:id', {authRequired: false}, {
 });
 
 // Comments collection routes
-Api.addCollection(Comments);
+Api.addCollection(Comments, {
+  endpoints: {
+    authRequired: false,
+    post: {
+      action: function() {
+        if(Comments.insert(_.omit(this.bodyParams, 'isLast'))) {
+          // Notify post subscribers about new comment
+          if(this.bodyParams.isLast) {
+            var post = Posts.findOne(this.bodyParams.postId),
+                commentAuthor = Meteor.users.findOne(this.bodyParams.userId).username,
+                commentAuthorId = this.bodyParams.userId,
+                params  =
+                {
+                  postId: post._id,
+                  postSlug: post.slug,
+                  commentAuthor: commentAuthor,
+                  commentBody: this.bodyParams.body
+                };
+
+
+            _.reject(post.commenters, function(memberId) {return memberId == commentAuthorId}).forEach(function(member) {
+              params.commenter = Meteor.users.findOne(member).username;
+              params.action = "commented on one of your posts";
+              Meteor.call('sendNotification', 'comments', params);
+            });
+          }
+
+          return {status: 'success', data: {message: 'Inserted new comment'}};
+        }
+        else {
+          return {
+            statusCode: 404,
+            status: 'fail',
+            message: 'Could not insert comment'
+          };
+        }
+      }
+    }
+  }
+});
 
 /**
  * @api {post} /users Create new user
  * @apiVersion 0.1.0
  * @apiName CreateUser
  * @apiGroup User
- * 
+ *
  * @apiParam {String} username Username of the user.
  * @apiParam {String} email Email of the user.
  *
@@ -170,10 +209,10 @@ Api.addRoute('user/:name', {authRequired: false}, {
         _id: user._id,
         username: user.username,
         profile: user.profile
-      }
+      };
     else
       return {
-        error: 'User not found' 
+        error: 'User not found'
       };
   }
 });

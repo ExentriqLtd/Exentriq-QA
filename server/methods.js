@@ -128,6 +128,60 @@ Meteor.methods({
     /*Posts.update(postId, {
       $set:
     });*/
+  },
+
+  sendNotification: function(source, params) {
+    check(source, String);
+    check(params, Object);
+
+    var link = "",
+      subject = "",
+      spaceId = "",
+      type = "",
+      message = "";
+
+    if (source == 'comments') {
+      link = '/posts/' + params.postId + '/' + params.postSlug;
+      subject = params.commentAuthor + ' ' + params.action + ' "' + s.truncate(params.commentBody, 15) + '"';
+      type = 'qa-comment';
+    }
+
+    var postSpace = Spaces.findOne({posts: params.postId});
+    if (postSpace) {
+      spaceId = '?spaceid=' + postSpace.id;
+    }
+
+
+    HTTP.call(
+      "POST",
+      Meteor.settings.public.integration_bus_url + '/createEvent', {
+        data: {
+          event:"Notification",
+          id:"",
+          entities:[
+            {
+              name:"Notification",
+              value: {
+                from: params.commentAuthor,
+                to: params.commenter,
+                subject: subject,
+                message: message,
+                picture:  Meteor.settings.public.avatar_path + '/' + params.commenter + '.jpg',
+                link: link + spaceId,
+                type: type,
+                postTitle: params.postTitle
+              }
+            }
+          ]
+        }
+      },
+      function (error, result) {
+        if (error) {
+          // Retry here ...
+          console.log('Error saving notification to integration bus');
+          console.log (error.message);
+        }
+      });
   }
 
 });
