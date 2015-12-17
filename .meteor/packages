@@ -38,3 +38,4 @@ telescope:update-prompt
 
 # my-custom-package
 nimble:restivus 				# Create authenticated REST APIs
+underscorestring:underscore.string
