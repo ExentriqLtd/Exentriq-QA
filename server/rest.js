@@ -133,7 +133,7 @@ Api.addCollection(Comments, {
 
             _.reject(post.commenters, function(memberId) {return memberId == commentAuthorId}).forEach(function(member) {
               params.commenter = Meteor.users.findOne(member).username;
-              params.action = "commented on one of your posts";
+              params.action = "has answered your question on QA";
               Meteor.call('sendNotification', 'comments', params);
             });
           }
