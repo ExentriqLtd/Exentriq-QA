@@ -8,8 +8,7 @@
         <div class="comment-meta">
           <div class="user-avatar avatar-medium" aria-hidden="true" aria-live="off">{{> avatar userId=userId shape="circle"}}</div>
           <a class="comment-username" href="{{getProfileUrl userId}}">{{authorName}}</a>
-          <a href="{{pathFor 'commentPage' _id=_id}}" class="comment-permalink comment-time">{{timeAgo ago}},</a>
-          <span class="points">{{upvotes}}</span> <span class="unit">{{pointsUnitDisplayText}}  </span>
+          <a href="{{pathFor 'commentPage' _id=_id}}" class="comment-permalink comment-time">{{timeAgo ago}}</a>
           {{#if canEdit this}}
             | <a class="edit-link" href="{{pathFor 'commentEdit' _id=_id}}">{{_ "edit"}}</a>
           {{/if}}
@@ -19,7 +18,6 @@
         </div>
         <div class="comment-main"> 
           <div class="comment-text markdown">{{{htmlBody}}}</div>
-          <a href="{{pathFor 'commentPage' _id=_id}}" class="comment-reply">{{_ "reply"}}</a>
         </div>
       </div>
       {{/if}}
