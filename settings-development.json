@@ -1,0 +1,9 @@
+{
+  "public": {
+    "ema_url": "http://boards.stage.exentriq.com",
+    "integration_bus_url": "http://bus.stage.exentriq.com:1880",
+    "platform_url": "http://stage.exentriq.com",
+    "avatar_path": "http://talk.stage.exentriq.com/avatar",
+    "parent_exec": "http://exentriq01.stage.exeq.me/qa"
+  }
+}

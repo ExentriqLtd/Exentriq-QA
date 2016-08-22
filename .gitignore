@@ -18,8 +18,6 @@ deploy.sh
 dump/
 dump/*
 
-settings-development.json
-settings-development.json
 settings.json.not-used
 .idea
 
